@@ -43,9 +43,21 @@ object Main extends App {
         .csv("sample-text")
 
     // Write DataFrame to Parquet
-    df.write.mode("overwrite").parquet("output/pageviewlog.parquet")
+    df.write.parquet("output/pageviewlog")
 
     // Perform other jobs here...
+
+    // Extract the day from the timestamp
+    val dfWithDay = df.withColumn("day", date_format(col("timeCreate"), "yyyy-MM-dd"))
+
+    // Get the most visited URL (domain or referer) per day for each GUID
+    val mostVisitedUrl = dfWithDay.groupBy("guid", "day", "domain")
+    .count()
+    .withColumn("rank", row_number().over(Window.partitionBy("guid", "day").orderBy(desc("count"))))
+    .filter(col("rank") === 1)
+    .select("guid", "day", "domain")
+
+    mostVisitedUrl.show()
 
     spark.stop()
 }
