@@ -2,12 +2,13 @@ import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.expressions.Window
-import spark.implicits._
 
 object Main extends App {
     val spark = SparkSession.builder()
         .appName("ParquetSpark")
         .getOrCreate()
+
+        import spark.implicits._
 
     val schema = StructType(Array(
         StructField("timeCreate", TimestampType, true),
