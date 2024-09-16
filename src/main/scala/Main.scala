@@ -108,7 +108,17 @@ object Main extends App {
     )
 
     // Save the result to a text file
-    filteredData
+
+    // Define a delimiter for columns
+    val delimiter = "\t"
+
+    // Create a single column with concatenated values
+    val concatenatedData = filteredData
+    .withColumn("line", concat_ws(delimiter, col("guid"), col("domain"), col("path"), col("timeCreate")))
+    .select("line") 
+
+    // Save the result to a text file
+    concatenatedData
     .coalesce(1) 
     .write
     .mode("overwrite") 
