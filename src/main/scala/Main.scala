@@ -38,7 +38,7 @@ object Main extends App {
             StructField("field24", StringType, true)
         ))
 
-    // Read the text file without a header
+    // Read the text file
     val df = spark.read
         .option("delimiter", "\t")
         .option("header", "false")
@@ -48,7 +48,7 @@ object Main extends App {
     // Write DataFrame to Parquet
     df.write.mode("overwrite").parquet("output/pageviewlog")
 
-    // Perform other jobs here...
+    // Perform jobs 
 
     // Extract the day from the timestamp
     val dfWithDay = df.withColumn("day", date_format(col("timeCreate"), "yyyy-MM-dd"))
@@ -97,6 +97,19 @@ object Main extends App {
     .select("osCode", "browserCode")
 
     popularBrowsers.show()
+
+    // 3.6
+    val filteredData = df.filter(unix_timestamp(col("timeCreate")) - unix_timestamp(col("cookieCreate")) > 600)
+    .select("guid", "domain", "path", "timeCreate")
+
+    // Save the result to a text file
+    filteredData
+    .coalesce(1) 
+    .write
+    .mode("overwrite") 
+    .option("header", "false") 
+    .format("text") 
+    .save("output/result.dat")
 
     spark.stop()
 }
