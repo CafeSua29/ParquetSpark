@@ -1,6 +1,7 @@
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.expressions.Window
 
 object Main extends App {
     val spark = SparkSession.builder()
@@ -50,14 +51,17 @@ object Main extends App {
     // Extract the day from the timestamp
     val dfWithDay = df.withColumn("day", date_format(col("timeCreate"), "yyyy-MM-dd"))
 
-    // Get the most visited URL (domain or referer) per day for each GUID
-    val mostVisitedUrl = dfWithDay.groupBy("guid", "day", "domain")
-    .count()
-    .withColumn("rank", row_number().over(Window.partitionBy("guid", "day").orderBy(desc("count"))))
-    .filter(col("rank") === 1)
-    .select("guid", "day", "domain")
+    // Example for the first job (most accessed URL per GUID)
+    val windowSpec = Window.partitionBy("guid", "day").orderBy(desc("count"))
 
-    mostVisitedUrl.show()
+    val mostAccessedUrl = df
+      .groupBy("guid", "url", "day")
+      .count()
+      .withColumn("rank", row_number().over(windowSpec))
+      .where($"rank" === 1)
+      .select("guid", "url", "count")
+
+    mostAccessedUrl.show()
 
     spark.stop()
 }
