@@ -32,7 +32,7 @@ object Main extends App {
             StructField("geographic", IntegerType, true),
             StructField("field19", StringType, true),
             StructField("field20", StringType, true),
-            StructField("field21", StringType, true),
+            StructField("url", StringType, true),
             StructField("field22", StringType, true),
             StructField("category", StringType, true),
             StructField("field24", StringType, true)
