@@ -46,7 +46,7 @@ object Main extends App {
         .csv("sample-text")
 
     // Write DataFrame to Parquet
-    df.write.parquet("output/pageviewlog")
+    df.write.mode("overwrite").parquet("output/pageviewlog")
 
     // Perform other jobs here...
 
