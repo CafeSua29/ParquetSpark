@@ -53,7 +53,7 @@ object Main extends App {
     // Extract the day from the timestamp
     val dfWithDay = df.withColumn("day", date_format(col("timeCreate"), "yyyy-MM-dd"))
 
-    // Example for the first job (most accessed URL per GUID)
+    // 3.1
     val windowSpec = Window.partitionBy("guid", "day").orderBy(desc("count"))
 
     val mostAccessedUrl = dfWithDay
@@ -64,6 +64,14 @@ object Main extends App {
       .select("guid", "url", "count")
 
     mostAccessedUrl.show()
+
+    // 3.2
+    val ipUsage = df.groupBy("ip")
+    .agg(countDistinct("guid").as("uniqueGuids"))
+    .orderBy(desc("uniqueGuids"))
+    .limit(1000)
+
+    ipUsage.show()
 
     spark.stop()
 }
