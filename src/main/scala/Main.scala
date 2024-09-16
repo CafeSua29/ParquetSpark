@@ -56,7 +56,7 @@ object Main extends App {
     // Example for the first job (most accessed URL per GUID)
     val windowSpec = Window.partitionBy("guid", "day").orderBy(desc("count"))
 
-    val mostAccessedUrl = df
+    val mostAccessedUrl = dfWithDay
       .groupBy("guid", "url", "day")
       .count()
       .withColumn("rank", row_number().over(windowSpec))
