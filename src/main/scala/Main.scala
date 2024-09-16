@@ -73,5 +73,30 @@ object Main extends App {
 
     ipUsage.show()
 
+    // 3.3
+    val topDomains = df.groupBy("domain")
+    .count()
+    .orderBy(desc("count"))
+    .limit(100)
+
+    topDomains.show()
+
+    // 3.4
+    val topLocIds = df.groupBy("locId")
+    .agg(countDistinct("ip").as("uniqueIps"))
+    .orderBy(desc("uniqueIps"))
+    .limit(10)
+
+    topLocIds.show()
+
+    // 3.5
+    val popularBrowsers = df.groupBy("osCode", "browserCode")
+    .count()
+    .withColumn("rank", row_number().over(Window.partitionBy("osCode").orderBy(desc("count"))))
+    .filter(col("rank") === 1)
+    .select("osCode", "browserCode")
+
+    popularBrowsers.show()
+
     spark.stop()
 }
