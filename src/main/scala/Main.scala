@@ -100,7 +100,7 @@ object Main extends App {
 
     // 3.6
     val filteredData = df.filter(unix_timestamp(col("timeCreate")) - unix_timestamp(col("cookieCreate")) > 600)
-    .select("guid", "domain", "path", "timeCreate")
+    .select(col("guid").cast("string"), col("domain"), col("path"), col("timeCreate"))
 
     // Save the result to a text file
     filteredData
@@ -110,6 +110,6 @@ object Main extends App {
     .option("header", "false") 
     .format("text") 
     .save("output/result.dat")
-
+    
     spark.stop()
 }
